@@ -1,0 +1,17 @@
+{
+  "timeZone": "Asia/Tokyo",
+  "dependencies": {
+    "libraries": [{
+      "userSymbol": "Testexceltogsheet",
+      "libraryId": "1hXTwkOlL_vXyPA3eLr2m_v2ODr9xywaXM_iRxwyzXINC_ON8r9j8fUxs",
+      "version": "1"
+    }, {
+      "userSymbol": "Moment",
+      "libraryId": "1VppwPVr_khC9TJfUeDj2nfWLxGC9SrOTy3dKi-cRRIrHm1nE7Pb-B5f9",
+      "version": "1",
+      "developmentMode": true
+    }]
+  },
+  "exceptionLogging": "STACKDRIVER",
+  "runtimeVersion": "V8"
+}
