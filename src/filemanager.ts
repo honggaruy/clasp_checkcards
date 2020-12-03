@@ -1,4 +1,4 @@
-﻿﻿namespace fileManager{
+﻿namespace fileManager{
     var newGFolder = DriveApp.getFolderById("16K05RlmkOiUvo0MPleXWajdpCMsAUOf8");  // 신규 구글 시트가 저장되는 폴더 ID
     var newEFolder = DriveApp.getFolderById("1DnKWGO5WumsYbQbEb999hC3jb_brQ8b0");  // 신규 엑셀 파일이 저장되는 폴더 ID
     var oldGFolder = DriveApp.getFolderById("1ndwKCmesPb-yNeEN_hc5bk1jABMEzkLC");  // 처리완료된 구글 시트가 저장되는 폴더 ID
@@ -16,9 +16,9 @@
     export function findRelatedFilesWith(ss, sheet) {
         var result = [];
         var gsi = newGFolder.getFilesByType(MimeType.GOOGLE_SHEETS);
-        while (gsi.hasNext())
-        {
+        while (gsi.hasNext()) {
             var file = gsi.next();
+            console.log(`${file.getName()} 비교 ${sheet.getName()}`);
             // 현재 legacy 시트의 이름으로 시작하는 이름을 가진 구글시트가 관련시트임.
             if(file.getName().startsWith(sheet.getName())) {
                 var fileSs = SpreadsheetApp.open(file);
@@ -40,7 +40,7 @@
                 }
             }
         }
-        // 반환하는 배열에서 시트를 이름의 오름차순으로 처리하도록 배열한다.
+        // 반환하는 배열에서 시트를 이름의 오름차순으로 처리하도록 배열한다. ex) 1,2,3, ...
         result.sort((a, b) => (a.getName() >= b.getName()) ? 1 : -1);
         return result;
     }
