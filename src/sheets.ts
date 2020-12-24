@@ -292,49 +292,75 @@ namespace sheetNamespace {
          */
         reorderSheetList(sheetList) {
             let result = [];
-            if ('현대카드' == this.cardname) {
-                result = sheetList.sort((a, b) => {
-                    const regexResultA = sheetNameRegexSetup[this.cardname].regex.exec(a.getName());
-                    const regexResultB = sheetNameRegexSetup[this.cardname].regex.exec(b.getName());
-                    let compare = 0;
-                    if (regexResultA && regexResultB) {
-                        const monthA = Number(regexResultA.groups.month);
-                        const monthB = Number(regexResultB.groups.month);
-                        const subnameA = regexResultA.groups.subname;
-                        const subnameB = regexResultB.groups.subname;
-                        // month 비교는 오름 차순, 다음 링크에서 compareFunction 검색 : https://developer.mozilla.org/ko/docs/Web/JavaScript/Reference/Global_Objects/Array/sort
-                        let monthDiff = monthA - monthB;
-                        if (monthDiff) {
-                            // 비교하는 대상간 month가 차이 있을 때
-                            if ([monthA, monthB].includes(1) && [monthA, monthB].includes(12)) {
-                                // months가 1과 12를 모두 포함하면 비교 결과를 반대로 한다 (1월 이 12월보다 크다)
-                                monthDiff = monthB - monthA;
-                            }
-                            compare = monthDiff;
-                        }
-                        else {
-                            // 비교하는 대상간 month가 차이 없을 때
-                            if ([subnameA, subnameB].every(current => ['KT', '코스트코'].includes(current))) {
-                                // compare function 결과가 음수이면 a가 앞쪽에 배치됨, 코스트코를 앞쪽에 배치
-                                const subnameDiff = subnameA == subnameB ? 0 : ('코스트코' == subnameA ? -1 : 1);
-                                compare = subnameDiff;
-                            }
-                            else {
-                                console.error(`${a.getName()}, ${b.getName()}이 표준에 맞지않음. (${subnameA}, ${subnameB})`);
-                            }
-                        }
+            result = sheetList.sort((a, b) => {
+                const regexResultA = sheetNameRegexSetup[this.cardname].regex.exec(a.getName());
+                const regexResultB = sheetNameRegexSetup[this.cardname].regex.exec(b.getName());
+                let compare = 0;
+                if (regexResultA && regexResultB) {
+                    compare = compareByMonth(regexResultA, regexResultB) 
+                    if (!compare){
+                        // 비교하는 대상간 month가 차이 없을 때
+                        if ( 'subname' in regexResultA.groups) compare = compareBySubname(regexResultA, regexResultB) 
+                        else console.error(`${a.getName()}, ${b.getName()}에서 month가 차이가없고 subname이 없는 경우는 에러임`) 
                     }
-                    else {
-                        console.error(`"${a.getName()}", "${b.getName()}" 중 하나는 표준시트이름이 아님`);
-                    }
-                    return compare;
-                });
-            }
-            else {
-                result = sheetList;
-            }
+                }
+                else {
+                    console.error(`"${a.getName()}", "${b.getName()}" 중 하나는 표준시트이름이 아님`);
+                }
+                return compare;
+            }) 
             return result;
+
+            /**
+             * 각 배열내의 멤버가 서로 포함되는지 비교한다 
+             * 서로 다른 멤버가 있다면 false
+             * 
+             * @param {array} a -  비교할 대상
+             * @param {array} b -  비교할 대상 
+             * @returns {boolean}
+             */
+            function isMembersEqual(a, b) {
+                return (a.every(value => b.includes(value)))
+            } 
+
+            /**
+             * nested function : 일반카드 처리함수 
+             *   12, 1월이 연속으로 들어올 때만 내림차순 (12, 1 순서 ) , 그 외에는 오름차순 ( 11, 12)
+             *   month 비교는 오름 차순, 다음 링크에서 compareFunction 검색 : https://developer.mozilla.org/ko/docs/Web/JavaScript/Reference/Global_Objects/Array/sort
+             * 
+             * @param {object} regexResultA - 첫번째 시트이름을 regex.exec 처리한 결과 
+             * @param {object} regexResultB - 두번째 시트이름을 regex.exec 처리한 결과 
+             * @returns {boolean} - sort 함수에서 사용될 비교결과  
+             */
+            function compareByMonth(regexResultA, regexResultB) {
+                const monthA = Number(regexResultA.groups.month);
+                const monthB = Number(regexResultB.groups.month);
+                return isMembersEqual([monthA, monthB], [1, 12]) ? monthB - monthA : monthA - monthB 
+            }
+
+            /**
+             * nested function : 현대카드요 추가 처리함수 
+             *   현대카드만 두개이므로 현대카드 Regex 결과만 subname group 을 가지고 있음
+             * 
+             * @param {object} regexResultA - 첫번째 시트이름을 regex.exec 처리한 결과 
+             * @param {object} regexResultB - 두번째 시트이름을 regex.exec 처리한 결과 
+             * @returns {boolean} - sort 함수에서 사용될 비교결과  
+             */
+            function compareBySubname(regexResultA, regexResultB) {
+                let result = 0
+                const subnameA = regexResultA.groups.subname;
+                const subnameB = regexResultB.groups.subname;
+                if (isMembersEqual([subnameA, subnameB], ['KT', '코스트코'])) {
+                    // compare function 결과가 음수이면 a가 앞쪽에 배치됨, 코스트코를 앞쪽에 배치
+                    result = subnameA == subnameB ? 0 : ('코스트코' == subnameA ? -1 : 1);
+                }
+                else {
+                    console.error(`${(regexResultA.input)}, ${regexResultB.input}이 표준에 맞지않음. (${subnameA}, ${subnameB})`);
+                }
+                return result 
+           }
         }
+
     }
     /**
      * 새로 복사해온 정보를 가지고 있는 카드시트
@@ -659,14 +685,27 @@ namespace sheetNamespace {
          * 수동으로 정리하는 데이터중 자동화 할 수 있는 것은 여기에서 자동화 할 것
          *
          * 기존 시트에 옮긴후 정리하는 것이 아니라 신규 정보 기준으로 데이타를 만든후에 이동
+         * 용어설명
+         * onetime : 일시불 
+         * manytime : 할부
          */
         setSideInfoOnlyForFinalType() {
-            const targetHeader = this.getRangeOfTextWith('결제원금');
-            const targetEnd = this.getRangeOfTextWith('일 시 불 소계');
-            const target = targetHeader.offset(1, 0, targetEnd.getRow() - targetHeader.getRow() - 1);
-            const targetSum = targetHeader.offset(targetHeader.getDataRegion().getLastRow() - 1, 0);
-            targetSum.setFormula(`=SUM(${target.getA1Notation()})`);
-            targetSum.offset(0, -1).setFormula(`=IF(${targetSum.offset(-2, 0).getA1Notation()}=${targetSum.getA1Notation()}, "OK", "Ngggg")`);
+            // 정보 파악 기준점 range 설정 
+            const onetimeHeader = this.getRangeOfTextWith('결제원금');
+            const onetimeEnd = this.getRangeOfTextWith('일 시 불 소계');
+            const manytimeEnd = this.getRangeOfTextWith('할 부 소계');
+            //  내용 편집할 range 설정
+            const onetime = onetimeHeader.offset(1, 0, onetimeEnd.getRow() - onetimeHeader.getRow() - 1);
+            const totalSum = onetimeHeader.offset(onetimeHeader.getDataRegion().getLastRow() - 1, 0);
+
+            let sumFormula = `=SUM(${onetime.getA1Notation()})`
+            if (manytimeEnd) {
+                // 아래 5는 결제원금열에 맞추기 위한 조정값임
+                const manytime = onetimeEnd.offset(1, 5, manytimeEnd.getRow() - onetimeEnd.getRow() - 1);
+                sumFormula +=  ` + SUM(${manytime.getA1Notation()})` 
+            } 
+            totalSum.setFormula(sumFormula);
+            totalSum.offset(0, -1).setFormula(`=IF(${totalSum.offset(-2, 0).getA1Notation()}=${totalSum.getA1Notation()}, "OK", "Ngggg")`);
         }
     }
     /**
