@@ -13,7 +13,7 @@ namespace Library {
     export var moment = Moment.moment;
 }
 
-const convExl2Gsheet = Testexceltogsheet.convertExcelTogoogleSheets
+const convExl2Gsheet = Testexceltogsheet.convertExcelToGoogleSheets
 
 function myMain () {
     const ss = Utils.getSpreadsheet();
