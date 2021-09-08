@@ -17,7 +17,7 @@ const convExl2Gsheet = Testexceltogsheet.convertExcelToGoogleSheets
 
 function myMain () {
     const ss = Utils.getSpreadsheet();
-    const excludeSheets = ['Dashboard'];
+    const excludeSheets = ['Dashboard', '사용내용메모'];
     for( let sheet of ss.getSheets()) {
         if( excludeSheets.includes( sheet.getName())) continue;     // 제외시트 건너뜀
         const legacySheet = new sheetNamespace.LegacyCard(sheet);

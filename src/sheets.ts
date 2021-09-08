@@ -587,7 +587,7 @@ namespace sheetNamespace {
             sumOfAll.setFormula(`=SUM(${target.getA1Notation()})`);
             //  sum 제목 표시
             this.sheet.getRange(this.numRowsOfWholeData + 2, targetCol + 8)
-                .setValue('<-- 롯데카드 총 이용금액 ( 통장출금확인예정 )');
+                .setValue('◀ 이용금액 ( 통장출금확인예정 )');
             // Sum 결과가 요약내역 합계와 일치하는지 확인 표시
             const summarySum = this.getRangeOfTextWith('합계').offset(0, 1);
             this.sheet.getRange(this.numRowsOfWholeData + 2, targetCol - 2)
@@ -595,19 +595,19 @@ namespace sheetNamespace {
             // 추가 작성할 내용 자리 확보, 금액 가져오는 것 자동화할지는 추후 결정
             const returnNeededCost = this.sheet.getRange(this.numRowsOfWholeData + 3, targetCol); // '환급필요 금액'의 금액숫자 Range
             returnNeededCost.setValue(0);
-            returnNeededCost.offset(0, 8).setValue('<--환급필요 금액');
+            returnNeededCost.offset(0, 8).setValue('◀ 환급필요 금액');
             returnNeededCost.offset(2, 0).setFormula(`=${sumOfAll.getA1Notation()}-${sumOfAll.offset(1, 0).getA1Notation()}`);
-            returnNeededCost.offset(2, 8).setValue(`<--롯데카드 ${monthStatus.getMonthString(this.newDataType)} 사용금액`);
+            returnNeededCost.offset(2, 8).setValue(`◀ 롯데카드 ${monthStatus.getMonthString(this.newDataType)} 사용금액`);
             returnNeededCost.offset(3, 0).setValue('자동화필요');
-            returnNeededCost.offset(3, 8).setValue(`<--삼성카드 ${monthStatus.getMonthString(this.newDataType)} 사용금액`);
+            returnNeededCost.offset(3, 8).setValue(`◀ 삼성카드 ${monthStatus.getMonthString(this.newDataType)} 사용금액`);
             returnNeededCost.offset(4, 0).setValue('자동화필요');
-            returnNeededCost.offset(4, 8).setValue(`<--현대카드 ${monthStatus.getMonthString(this.newDataType)} 사용금액`);
+            returnNeededCost.offset(4, 8).setValue(`◀ 현대카드 ${monthStatus.getMonthString(this.newDataType)} 사용금액`);
             returnNeededCost.offset(5, 0).setValue('현금&이체합계');
-            returnNeededCost.offset(5, 8).setValue(`<--현금&이체 사용금액`);
+            returnNeededCost.offset(5, 8).setValue(`◀ 현금&이체 사용금액`);
             returnNeededCost.offset(6, 0).setFormula(`=SUM(${returnNeededCost.offset(2, 0, 4).getA1Notation()})`);
-            returnNeededCost.offset(6, 8).setValue(`<--총 사용금액`);
-            returnNeededCost.offset(7, 0).setFormula(`=3700000-${returnNeededCost.offset(6, 0).getA1Notation()}`);
-            returnNeededCost.offset(7, 8).setValue(`<--마누라에게 줄 돈(받을 돈), 언제 이체했는지 확인 필요(자동화?)`);
+            returnNeededCost.offset(6, 8).setValue(`◀ 총 사용금액`);
+            returnNeededCost.offset(7, 0).setFormula(`=4000000-${returnNeededCost.offset(6, 0).getA1Notation()}`);
+            returnNeededCost.offset(7, 8).setValue(`◀ 마누라에게 줄 돈(받을 돈), 언제 이체했는지 확인 필요(자동화?)`);
             // 중요정보 컬러 반전으로 강조
             returnNeededCost.offset(6, 0, 2, 9).setBackground('black').setFontColor('white').setFontWeight("bold");
             // 통장 현금, 이체 부분
